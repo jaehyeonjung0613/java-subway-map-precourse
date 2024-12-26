@@ -129,5 +129,73 @@ public class Application {
 
 애플리케이션 실행 및 종료.
 
+## 2. 콘솔 입출력
+
+```java
+// ConsoleConstants.java
+
+package subway.ui;
+
+public final class ConsoleConstants {
+    private ConsoleConstants() {
+    }
+
+    public static final String HEADER_LOG_FORMAT = "## %s";
+    public static final String INFO_LOG_FORMAT = "[INFO] %s";
+    public static final String ERROR_LOG_FORMAT = "[ERROR] %s";
+}
+```
+
+출력 관련 상수 정의.
+
+```java
+// Console.java
+
+package subway.ui;
+
+import static subway.ui.ConsoleConstants.*;
+
+import java.util.Scanner;
+
+public class Console {
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static String readline() {
+        return scanner.nextLine();
+    }
+
+    public static void print(String message) {
+        System.out.print(message);
+    }
+
+    public static void println(String message) {
+        System.out.println(message);
+    }
+
+    public static void printNextLine() {
+        System.out.println();
+    }
+
+    public static void printFormat(String format, Object... args) {
+        println(String.format(format, args));
+    }
+
+    public static void printHeader(String message) {
+        printFormat(HEADER_LOG_FORMAT, message);
+    }
+
+    public static void printInfo(String message) {
+        printFormat(INFO_LOG_FORMAT, message);
+    }
+
+    public static void printError(String message) {
+        printFormat(ERROR_LOG_FORMAT, message);
+    }
+}
+```
+
+콘솔 입출력 기능 생성.
+
 
 
