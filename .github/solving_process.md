@@ -361,5 +361,62 @@ public abstract class Menu<T extends ViewController> {
 
 메뉴 항목 관리 및 CommandLine 과 ViewController 기능 매핑을 위한 구성. 
 
+## 5. 메뉴 항목 출력
+
+```java
+// MenuConstants.java
+
+package subway.menu;
+
+public final class MenuConstants {
+    private MenuConstants() {
+    }
+
+    public static final String MENU_ITEM_OUTPUT_FORMAT = "%s. %s";
+}
+```
+
+출력 관련 상수 정의.
+
+```java
+// Menu.java
+
+package subway.menu;
+
+import static subway.menu.MenuConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    private CommandLine getCommandLine(String command) {
+        return this.commandLineList.stream()
+            .filter(commandLine -> commandLine.getCommand().equals(command))
+            .findFirst()
+            .get();
+    }
+
+    public final String output(String command) {
+        CommandLine commandLine = this.getCommandLine(command);
+        return String.format(MENU_ITEM_OUTPUT_FORMAT, commandLine.getCommand(), commandLine.getLabel());
+    }
+
+    public final String outputAll() {
+        StringBuilder builder = new StringBuilder();
+        for (CommandLine commandLine : this.commandLineList) {
+            builder.append(this.output(commandLine.getCommand()));
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+}
+```
+
+메뉴 항목 출력 기능 생성.
+
+
+
 
 
