@@ -60,3 +60,74 @@
 |   클래스   | 기능          |
 |:-------:|:------------|
 | Console | - 콘솔 입출력 처리 |
+
+## 1. 애플리케이션 Skeleton
+
+```java
+// Subway.java
+
+package subway.infrastructure;
+
+public class Subway {
+    private static Subway instance;
+
+    private Subway() {
+    }
+
+    protected static Subway getInstance() {
+        if (instance == null) {
+            instance = new Subway();
+        }
+        return instance;
+    }
+
+    public void run() {
+    }
+
+    public void finish() {
+        instance = null;
+    }
+}
+```
+
+Subway 애플리케이션 런처 동작 및 종료 구성.
+
+```java
+// SubwayBuilder.java
+
+package subway.infrastructure;
+
+public class SubwayBuilder {
+
+    public Subway build() {
+        return Subway.getInstance();
+    }
+}
+```
+
+런처 builder 생성.
+
+```java
+// Application.java
+
+package subway;
+
+import subway.infrastructure.Subway;
+import subway.infrastructure.SubwayBuilder;
+
+public class Application {
+    public static void main(String[] args) {
+        Subway subway = new SubwayBuilder().build();
+        try {
+            subway.run();
+        } finally {
+            subway.finish();
+        }
+    }
+}
+```
+
+애플리케이션 실행 및 종료.
+
+
+
