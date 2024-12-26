@@ -277,7 +277,89 @@ public class RestViewController {
 
 화면 생성 및 동작 절차를 수행하도록 처리.
 
+## 4. 메뉴 관리 Skeleton
 
+```java
+// MenuItem.java
+
+package subway.menu;
+
+public class MenuItem {
+    private final String label;
+    private final Runnable handler;
+
+    public MenuItem(String label, Runnable handler) {
+        this.label = label;
+        this.handler = handler;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public Runnable getHandler() {
+        return handler;
+    }
+}
+```
+
+메뉴 항목별 필요 정보 구성.
+
+```java
+// CommandLine.java
+
+package subway.menu;
+
+public class CommandLine {
+    private final String command;
+    private final MenuItem menuItem;
+
+    public CommandLine(String command, MenuItem menuItem) {
+        this.command = command;
+        this.menuItem = menuItem;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public String getLabel() {
+        return this.menuItem.getLabel();
+    }
+
+    public Runnable getHandler() {
+        return this.menuItem.getHandler();
+    }
+}
+```
+
+명령어와 메뉴 항목 매핑.
+
+```java
+// Menu.java
+
+package subway.menu;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    private final List<CommandLine> commandLineList;
+    protected final T viewController;
+
+    public Menu(T viewController) {
+        this.commandLineList = new ArrayList<>();
+        this.viewController = viewController;
+        this.setup();
+    }
+
+    abstract protected void setup();
+}
+```
+
+메뉴 항목 관리 및 CommandLine 과 ViewController 기능 매핑을 위한 구성. 
 
 
 
