@@ -197,5 +197,87 @@ public class Console {
 
 콘솔 입출력 기능 생성.
 
+## 3. View 생성 및 처리 Skeleton
+
+```java
+// View.java
+
+package subway.view;
+
+public class View {
+    private final String name;
+
+    public View(String name) {
+        this.name = name;
+    }
+
+    public void show() {
+    }
+
+    public String requestCommand() {
+    }
+
+    public void onSelect(String command) {
+    }
+
+    public boolean isClose() {
+        return true;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+```
+
+화면 동작에 필요한 기능 구성.
+
+```java
+// ViewController.java
+
+package subway.controller;
+
+import subway.view.View;
+
+public interface ViewController {
+    View make();
+}
+```
+
+화면 생성 인터페이스 Controller 정의.
+
+```java
+// RestViewController.java
+
+package subway.controller;
+
+import subway.ui.Console;
+import subway.view.View;
+
+public class RestViewController {
+
+    public static void execute(ViewController viewController) {
+        View view = viewController.make();
+
+        String command;
+        do {
+            try {
+                view.show();
+                command = view.requestCommand();
+                view.onSelect(command);
+            } catch (IllegalArgumentException e) {
+                Console.printError(e.getMessage());
+            } finally {
+                Console.printNextLine();
+            }
+        } while (!view.isClose());
+    }
+}
+```
+
+화면 생성 및 동작 절차를 수행하도록 처리.
+
+
+
 
 
