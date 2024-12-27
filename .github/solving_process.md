@@ -516,6 +516,71 @@ public abstract class Menu<T extends ViewController> {
 
 메뉴 종료 기능 생성.
 
+## 9. View 동작 구현
+
+```java
+// ViewConstants.java
+
+package subway.view;
+
+public final class ViewConstants {
+    private ViewConstants() {
+    }
+
+    public static final String REQUEST_COMMAND_QUERY = "원하는 기능을 선택하세요.";
+}
+```
+
+메뉴 선택 질의문 정의.
+
+```java
+// View.java
+
+package subway.view;
+
+import static subway.view.ViewConstants.*;
+
+import subway.controller.ViewController;
+import subway.menu.Menu;
+import subway.ui.Console;
+
+public class View {
+    private final String name;
+    private final Menu menu;
+
+    public View(String name, Menu menu) {
+        this.name = name;
+        this.menu = menu;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void show() {
+        Console.printHeader(this.getName());
+        Console.println(this.menu.outputAll());
+    }
+
+    public String requestCommand() {
+        Console.printHeader(REQUEST_COMMAND_QUERY);
+        return Console.readline();
+    }
+
+    public void onSelect(String command) {
+        Console.printNextLine();
+        this.menu.select(command);
+    }
+
+    public boolean isClose() {
+        return this.menu.isClose();
+    }
+}
+```
+
+Menu 기능을 활용하여 View 동작 구현.
+
+
 
 
 
