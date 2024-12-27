@@ -739,6 +739,122 @@ public class MainMenu extends Menu<MainViewController> {
 
 Station View 실행 메뉴 항목과 매핑.
 
+## 12. 역 조회
+
+```java
+// Service.java
+
+package subway.service;
+
+public interface Service {
+}
+```
+
+비즈니스 인터페이스 Service 정의. 
+
+```java
+// StationService.java
+
+package subway.service;
+
+import java.util.List;
+
+import subway.domain.Station;
+import subway.repository.StationRepository;
+
+public class StationService implements Service {
+    public List<Station> selectStationList() {
+        return StationRepository.stations();
+    }
+}
+```
+
+Station 목록 반환 기능 생성.
+
+```java
+// Controller.java
+
+package subway.controller;
+
+public interface Controller {
+}
+```
+
+비즈니스 인터페이스 Controller 정의.
+
+```java
+// StationController.java
+
+package subway.controller;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.domain.Station;
+import subway.service.StationService;
+
+public class StationController implements Controller {
+    private final StationService stationService = new StationService();
+
+    public List<String> selectStationNameList() {
+        List<Station> stationList = stationService.selectStationList();
+        return stationList.stream().map(Station::getName).collect(Collectors.toList());
+    }
+}
+```
+
+Station 명 목록 반환 기능 생성.
+
+```java
+// StationViewController.java
+
+package subway.controller;
+
+import java.util.List;
+
+import subway.menu.StationMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class StationViewController implements ViewController {
+    private final StationController stationController = new StationController();
+
+    public void printStationNameAll() {
+        Console.printHeader("역 목록");
+        List<String> stationNameList = stationController.selectStationNameList();
+        for (String stationName : stationNameList) {
+            Console.printInfo(stationName);
+        }
+    }
+}
+```
+
+```java
+// StationMenu.java
+
+package subway.menu;
+
+import subway.controller.StationViewController;
+
+public class StationMenu extends Menu<StationViewController> {
+    public StationMenu(StationViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 등록", ()->{});
+        this.addMenuItem("2", "역 삭제", ()->{});
+        this.addMenuItem("3", "역 조회", this.viewController::printStationNameAll);
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+역 목록 조회 구현.
+
+
+
 
 
 
