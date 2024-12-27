@@ -2,6 +2,7 @@ package subway.infrastructure;
 
 import subway.controller.MainViewController;
 import subway.controller.RestViewController;
+import subway.repository.StationRepository;
 
 public class Subway {
     private static Subway instance;
@@ -19,7 +20,12 @@ public class Subway {
         return instance;
     }
 
+    private void init() {
+        StationRepository.init();
+    }
+
     public void run() {
+        this.init();
         RestViewController.execute(mainViewController);
     }
 
