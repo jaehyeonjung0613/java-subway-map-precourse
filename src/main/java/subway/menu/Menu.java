@@ -39,4 +39,14 @@ public abstract class Menu<T extends ViewController> {
         }
         return builder.toString();
     }
+
+    public final void insertMenuItem(int position, String command, String label, Runnable handler) {
+        MenuItem menuItem = new MenuItem(label, handler);
+        CommandLine commandLine = new CommandLine(command, menuItem);
+        this.commandLineList.add(position, commandLine);
+    }
+
+    public final void addMenuItem(String command, String label, Runnable handler) {
+        this.insertMenuItem(0, command, label, handler);
+    }
 }
