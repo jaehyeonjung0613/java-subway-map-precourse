@@ -8,17 +8,16 @@ public class RestViewController {
     public static void execute(ViewController viewController) {
         View view = viewController.make();
 
-        String command;
+        Runnable handler;
         do {
             try {
                 view.show();
-                command = view.requestCommand();
-                view.onSelect(command);
+                handler = view.requestCommand();
+                handler.run();
             } catch (IllegalArgumentException e) {
                 Console.printError(e.getMessage());
-            } finally {
-                Console.printNextLine();
             }
         } while (!view.isClose());
+        Console.printNextLine();
     }
 }

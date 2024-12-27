@@ -23,14 +23,20 @@ public class View {
         Console.println(this.menu.outputAll());
     }
 
-    public String requestCommand() {
-        Console.printHeader(REQUEST_COMMAND_QUERY);
-        return Console.readline();
-    }
-
-    public void onSelect(String command) {
-        Console.printNextLine();
-        this.menu.select(command);
+    public Runnable requestCommand() {
+        String command;
+        do {
+            try {
+                Console.printHeader(REQUEST_COMMAND_QUERY);
+                command = Console.readline();
+                return this.menu.select(command);
+            } catch (IllegalArgumentException e) {
+                Console.printNextLine();
+                Console.printError(e.getMessage());
+            } finally {
+                Console.printNextLine();
+            }
+        } while (true);
     }
 
     public boolean isClose() {
