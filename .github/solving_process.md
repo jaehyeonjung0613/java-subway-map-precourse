@@ -438,7 +438,7 @@ public abstract class Menu<T extends ViewController> {
     }
 
     public final void addMenuItem(String command, String label, Runnable handler) {
-        this.insertMenuItem(0, command, label, handler);
+        this.insertMenuItem(this.commandLineList.size(), command, label, handler);
     }
 }
 ```
@@ -466,6 +466,7 @@ public abstract class Menu<T extends ViewController> {
     }
 }
 ```
+
 메뉴 항목 선택 기능 생성.
 
 ## 8. 메뉴 종료
@@ -579,8 +580,6 @@ public class View {
 ```
 
 Menu 기능을 활용하여 View 동작 구현.
-
-
 
 
 

@@ -50,7 +50,7 @@ public abstract class Menu<T extends ViewController> {
     }
 
     public final void addMenuItem(String command, String label, Runnable handler) {
-        this.insertMenuItem(0, command, label, handler);
+        this.insertMenuItem(this.commandLineList.size(), command, label, handler);
     }
 
     public final void select(String command) {
