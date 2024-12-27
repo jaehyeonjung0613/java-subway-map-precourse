@@ -11,10 +11,13 @@ public abstract class Menu<T extends ViewController> {
     private final List<CommandLine> commandLineList;
     protected final T viewController;
 
+    private MenuState state = MenuState.IDLE;
+
     public Menu(T viewController) {
         this.commandLineList = new ArrayList<>();
         this.viewController = viewController;
         this.setup();
+        this.state = MenuState.OPEN;
     }
 
     abstract protected void setup();
@@ -53,5 +56,13 @@ public abstract class Menu<T extends ViewController> {
     public final void select(String command) {
         CommandLine commandLine = this.getCommandLine(command);
         commandLine.getHandler().run();
+    }
+
+    public final void close() {
+        this.state = MenuState.CLOSE;
+    }
+
+    public final boolean isClose() {
+        return MenuState.CLOSE.equals(this.state);
     }
 }
