@@ -954,7 +954,92 @@ public class StationMenu extends Menu<StationViewController> {
 
 역 조회 후 메인 화면으로 넘어가도록 수정.
 
+## 15. 올바른 명령어 받을때까지 입력
 
+```java
+// Menu.java
+
+package subway.menu;
+
+import static subway.menu.MenuConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    public final Runnable select(String command) {
+        CommandLine commandLine = this.getCommandLine(command);
+        return commandLine.getHandler();
+    }
+}
+```
+
+메뉴 항목 선택시 handler 반환되도록 수정.
+
+```java
+// View.java
+
+package subway.view;
+
+import static subway.view.ViewConstants.*;
+
+import subway.menu.Menu;
+import subway.ui.Console;
+
+public class View {
+    public Runnable requestCommand() {
+        String command;
+        do {
+            try {
+                Console.printHeader(REQUEST_COMMAND_QUERY);
+                command = Console.readline();
+                return this.menu.select(command);
+            } catch(IllegalArgumentException e) {
+                Console.printNextLine();
+                Console.printError(e.getMessage());
+            } finally {
+                Console.printNextLine();
+            }
+        } while(true);
+    }
+}
+```
+
+명령어 입력시 해당 메뉴 항목의 handler 반환되도록 수정(기존 onSelect 제거).
+
+handler 처리는 외부에 위임.
+
+```java
+// RestViewController.java
+
+package subway.controller;
+
+import subway.ui.Console;
+import subway.view.View;
+
+public class RestViewController {
+
+    public static void execute(ViewController viewController) {
+        View view = viewController.make();
+
+        Runnable handler;
+        do {
+            try {
+                view.show();
+                handler = view.requestCommand();
+                handler.run();
+            } catch (IllegalArgumentException e) {
+                Console.printError(e.getMessage());
+            }
+        } while (!view.isClose());
+        Console.printNextLine();
+    }
+}
+```
+
+직접 handler 호출하도록 변경.
 
 
 
