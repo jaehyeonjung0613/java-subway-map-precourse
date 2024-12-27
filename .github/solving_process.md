@@ -359,7 +359,7 @@ public abstract class Menu<T extends ViewController> {
 }
 ```
 
-메뉴 항목 관리 및 CommandLine 과 ViewController 기능 매핑을 위한 구성. 
+메뉴 항목 관리 및 CommandLine 과 ViewController 기능 매핑을 위한 구성.
 
 ## 5. 메뉴 항목 출력
 
@@ -415,6 +415,35 @@ public abstract class Menu<T extends ViewController> {
 ```
 
 메뉴 항목 출력 기능 생성.
+
+## 6. 메뉴 항목 추가
+
+```java
+// Menu.java
+
+package subway.menu;
+
+import static subway.menu.MenuConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    public final void insertMenuItem(int position, String command, String label, Runnable handler) {
+        MenuItem menuItem = new MenuItem(label, handler);
+        CommandLine commandLine = new CommandLine(command, menuItem);
+        this.commandLineList.add(position, commandLine);
+    }
+
+    public final void addMenuItem(String command, String label, Runnable handler) {
+        this.insertMenuItem(0, command, label, handler);
+    }
+}
+```
+
+메뉴 항목 추가 및 삽입 기능 생성.
 
 
 
