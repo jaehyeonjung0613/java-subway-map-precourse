@@ -65,4 +65,9 @@ public abstract class Menu<T extends ViewController> {
     public final boolean isClose() {
         return MenuState.CLOSE.equals(this.state);
     }
+
+    public final void handleSelectAfterClose(Runnable handler) {
+        handler.run();
+        this.close();
+    }
 }
