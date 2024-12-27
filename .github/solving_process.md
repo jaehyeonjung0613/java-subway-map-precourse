@@ -853,8 +853,57 @@ public class StationMenu extends Menu<StationViewController> {
 
 역 목록 조회 구현.
 
+## 13. 역 데이터 초기화
 
+```java
+// StationRepository.java
 
+package subway.repository;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+import subway.domain.Station;
+
+public class StationRepository {
+    public static void init() {
+        addStation(new Station("교대역"));
+        addStation(new Station("강남역"));
+        addStation(new Station("역삼역"));
+        addStation(new Station("남부터미널역"));
+        addStation(new Station("양재역"));
+        addStation(new Station("양재시민의숲역"));
+        addStation(new Station("매봉역"));
+    }
+}
+```
+
+기초 데이터 초기화.
+
+```java
+// Subway.java
+
+package subway.infrastructure;
+
+import subway.controller.MainViewController;
+import subway.controller.RestViewController;
+import subway.repository.StationRepository;
+
+public class Subway {
+    private void init() {
+        StationRepository.init();
+    }
+
+    public void run() {
+        this.init();
+        RestViewController.execute(mainViewController);
+    }
+}
+```
+
+애플리케이션 구동시 역 기초 데이터 초기화.
 
 
 
