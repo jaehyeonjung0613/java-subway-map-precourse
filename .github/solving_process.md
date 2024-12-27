@@ -468,6 +468,54 @@ public abstract class Menu<T extends ViewController> {
 ```
 메뉴 항목 선택 기능 생성.
 
+## 8. 메뉴 종료
+
+```java
+// MenuState.java
+
+package subway.menu;
+
+public enum MenuState {
+    IDLE, OPEN, CLOSE
+}
+```
+
+메뉴 컨트롤을 위한 상태값 정의.
+
+```java
+// Menu.java
+
+package subway.menu;
+
+import static subway.menu.MenuConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    private MenuState state = MenuState.IDLE;
+
+    public Menu(T viewController) {
+        this.commandLineList = new ArrayList<>();
+        this.viewController = viewController;
+        this.setup();
+        this.state = MenuState.OPEN;
+    }
+
+    public final void close() {
+        this.state = MenuState.CLOSE;
+    }
+
+    public final boolean isClose() {
+        return MenuState.CLOSE.equals(this.state);
+    }
+}
+```
+
+메뉴 종료 기능 생성.
+
 
 
 
