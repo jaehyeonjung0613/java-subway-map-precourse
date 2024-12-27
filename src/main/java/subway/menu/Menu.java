@@ -49,4 +49,9 @@ public abstract class Menu<T extends ViewController> {
     public final void addMenuItem(String command, String label, Runnable handler) {
         this.insertMenuItem(0, command, label, handler);
     }
+
+    public final void select(String command) {
+        CommandLine commandLine = this.getCommandLine(command);
+        commandLine.getHandler().run();
+    }
 }
