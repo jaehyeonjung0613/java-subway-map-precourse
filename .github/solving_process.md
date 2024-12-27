@@ -445,6 +445,37 @@ public abstract class Menu<T extends ViewController> {
 
 메뉴 항목 추가 및 삽입 기능 생성.
 
+## 7. 메뉴 항목 선택
+
+```java
+// Menu.java
+
+package subway.menu;
+
+import static subway.menu.MenuConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    public final void select(String command) {
+        CommandLine commandLine = this.getCommandLine(command);
+        commandLine.getHandler().run();
+    }
+}
+```
+메뉴 항목 선택 기능 생성.
+
+
+
+
+
+
+
+
+
 
 
 
