@@ -581,7 +581,80 @@ public class View {
 
 Menu 기능을 활용하여 View 동작 구현.
 
+## 10. 메인 화면 출력
 
+```java
+// MainViewController.java
+
+package subway.controller;
+
+import subway.menu.MainMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class MainViewController implements ViewController {
+
+    @Override
+    public View make() {
+        MainMenu menu = new MainMenu(this);
+        return new View("메인 화면", menu);
+    }
+}
+```
+
+```java
+// MainMenu.java
+
+package subway.menu;
+
+import subway.controller.MainViewController;
+
+public class MainMenu extends Menu<MainViewController> {
+    public MainMenu(MainViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 관리", () -> {
+        });
+        this.addMenuItem("2", "노선 관리", () -> {
+        });
+        this.addMenuItem("3", "구간 관리", () -> {
+        });
+        this.addMenuItem("4", "지하철 노선도 출력", () -> {
+        });
+        this.addMenuItem("Q", "종료", this::close);
+    }
+}
+```
+
+Main View 및 Menu 생성.
+
+```java
+// Subway.java
+
+package subway.infrastructure;
+
+import subway.controller.MainViewController;
+import subway.controller.RestViewController;
+
+public class Subway {
+    private static Subway instance;
+
+    private final MainViewController mainViewController;
+
+    private Subway() {
+        mainViewController = new MainViewController();
+    }
+
+    public void run() {
+        RestViewController.execute(mainViewController);
+    }
+}
+```
+
+애플리케이션 launcher 실행 구현.
 
 
 
