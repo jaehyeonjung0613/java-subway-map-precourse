@@ -905,6 +905,56 @@ public class Subway {
 
 애플리케이션 구동시 역 기초 데이터 초기화.
 
+## 14. 메뉴 선택 후 종료
+
+```java
+// Menu.java
+package subway.menu;
+
+import static subway.menu.MenuConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    public final void handleSelectAfterClose(Runnable handler) {
+        handler.run();
+        this.close();
+    }
+}
+```
+
+메뉴 선택 이후 닫기 기능 생성.
+
+```java
+// StationMenu.java
+
+package subway.menu;
+
+import subway.controller.StationViewController;
+
+public class StationMenu extends Menu<StationViewController> {
+    public StationMenu(StationViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 등록", () -> {
+        });
+        this.addMenuItem("2", "역 삭제", () -> {
+        });
+        this.addMenuItem("3", "역 조회", () -> this.handleSelectAfterClose(this.viewController::printStationNameAll));
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+역 조회 후 메인 화면으로 넘어가도록 수정.
+
+
 
 
 
