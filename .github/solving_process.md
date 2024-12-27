@@ -656,6 +656,88 @@ public class Subway {
 
 애플리케이션 launcher 실행 구현.
 
+## 11. 역 관리 화면 출력
+
+```java
+// StationViewController.java
+
+package subway.controller;
+
+import subway.menu.StationMenu;
+import subway.view.View;
+
+public class StationViewController implements ViewController{
+    @Override
+    public View make() {
+        StationMenu menu = new StationMenu(this);
+        return new View("역 관리 화면", menu);
+    }
+}
+```
+
+```java
+// StationMenu.java
+
+package subway.menu;
+
+import subway.controller.StationViewController;
+
+public class StationMenu extends Menu<StationViewController> {
+    public StationMenu(StationViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 등록", ()->{});
+        this.addMenuItem("2", "역 삭제", ()->{});
+        this.addMenuItem("3", "역 조회", ()->{});
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+Station View 및 Menu 생성.
+
+```java
+// MainViewController.java
+
+package subway.controller;
+
+import subway.menu.MainMenu;
+import subway.view.View;
+
+public class MainViewController implements ViewController {
+    private final StationViewController stationViewController = new StationViewController();
+
+    public void openStationView() {
+        RestViewController.execute(stationViewController);
+    }
+}
+```
+
+Station View 실행 기능 생성.
+
+```java
+// MainMenu.java
+
+package subway.menu;
+
+import subway.controller.MainViewController;
+
+public class MainMenu extends Menu<MainViewController> {
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 관리", this.viewController::openStationView);
+        this.addMenuItem("2", "노선 관리", ()->{});
+        this.addMenuItem("3", "구간 관리", ()->{});
+        this.addMenuItem("4", "지하철 노선도 출력", ()->{});
+        this.addMenuItem("Q", "종료", this::close);
+    }
+}
+```
+
+Station View 실행 메뉴 항목과 매핑.
 
 
 
