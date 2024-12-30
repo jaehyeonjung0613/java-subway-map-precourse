@@ -1386,7 +1386,125 @@ public class StationService implements Service {
 }
 ```
 
-Entity 아닌 DTO 로 전달. 
+Entity 아닌 DTO 로 전달.
 
+## 19. 역 관리 유효성 체크
 
+```java
+// StationConstants.java
+
+package subway.domain;
+
+public final class StationConstants {
+    private StationConstants() {
+    }
+
+    public static final int MIN_NAME_LENGTH = 2;
+
+    public static final String EMPTY_NAME_MESSAGE = "지하철 역 이름은 필수로 입력되어야합니다.";
+    public static final String MIN_NAME_LENGTH_FORMAT = "지하철 역 이름은 %d글자 이상이어야 합니다.";
+}
+```
+
+```java
+// Station.java
+
+package subway.domain;
+
+import static subway.domain.StationConstants.*;
+
+import subway.dto.StationDTO;
+
+public class Station implements Entity<StationDTO> {
+    private final String name;
+
+    public Station(String name) throws IllegalArgumentException {
+        validateName(name);
+        this.name = name;
+    }
+
+    private void validateName(String name) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException(EMPTY_NAME_MESSAGE);
+        }
+        if (name.length() < MIN_NAME_LENGTH) {
+            throw new IllegalArgumentException(String.format(MIN_NAME_LENGTH_FORMAT, MIN_NAME_LENGTH));
+        }
+    }
+}
+```
+
+역 이름 관련 유효성 체크.
+
+```java
+// StationRepository.java
+
+package subway.repository;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import subway.domain.Station;
+
+public class StationRepository {
+    private static final List<Station> stations = new ArrayList<>();
+
+    public static Optional<Station> selectByName(String name) {
+        return stations.stream().filter(station -> Objects.equals(station.getName(), name)).findFirst();
+    }
+}
+```
+
+```java
+// StationServiceConstants.java
+
+package subway.service;
+
+public final class StationServiceConstants {
+    private StationServiceConstants() {
+    }
+
+    public static final String ALREADY_EXISTS_STATION_NAME_MESSAGE = "이미 등록된 역 이름입니다.";
+    public static final String NOT_EXISTS_STATION_NAME_MESSAGE = "존재하지 않은 역 이름입니다.";
+}
+```
+
+```java
+// StationService.java
+
+package subway.service;
+
+import static subway.service.StationServiceConstants.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import subway.domain.Station;
+import subway.dto.StationDTO;
+import subway.repository.StationRepository;
+
+public class StationService implements Service {
+    public void insertStation(StationDTO stationDTO) throws IllegalArgumentException {
+        Station station = stationDTO.toEntity();
+        Optional<Station> optionalStation = StationRepository.selectByName(station.getName());
+        optionalStation.ifPresent((existedStation) -> {
+            throw new IllegalArgumentException(ALREADY_EXISTS_STATION_NAME_MESSAGE);
+        });
+        StationRepository.addStation(station);
+    }
+
+    public void deleteStation(StationDTO stationDTO) throws IllegalArgumentException {
+        Station station = stationDTO.toEntity();
+        Optional<Station> existedStation = StationRepository.selectByName(station.getName());
+        existedStation.orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION_NAME_MESSAGE));
+        StationRepository.deleteStation(station.getName());
+    }
+}
+```
+
+역 등록 및 삭제시 미존재, 존재 유효성 체크.
 
