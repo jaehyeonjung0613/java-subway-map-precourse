@@ -666,7 +666,7 @@ package subway.controller;
 import subway.menu.StationMenu;
 import subway.view.View;
 
-public class StationViewController implements ViewController{
+public class StationViewController implements ViewController {
     @Override
     public View make() {
         StationMenu menu = new StationMenu(this);
@@ -689,9 +689,12 @@ public class StationMenu extends Menu<StationViewController> {
 
     @Override
     protected void setup() {
-        this.addMenuItem("1", "역 등록", ()->{});
-        this.addMenuItem("2", "역 삭제", ()->{});
-        this.addMenuItem("3", "역 조회", ()->{});
+        this.addMenuItem("1", "역 등록", () -> {
+        });
+        this.addMenuItem("2", "역 삭제", () -> {
+        });
+        this.addMenuItem("3", "역 조회", () -> {
+        });
         this.addMenuItem("B", "돌아가기", this::close);
     }
 }
@@ -729,9 +732,12 @@ public class MainMenu extends Menu<MainViewController> {
     @Override
     protected void setup() {
         this.addMenuItem("1", "역 관리", this.viewController::openStationView);
-        this.addMenuItem("2", "노선 관리", ()->{});
-        this.addMenuItem("3", "구간 관리", ()->{});
-        this.addMenuItem("4", "지하철 노선도 출력", ()->{});
+        this.addMenuItem("2", "노선 관리", () -> {
+        });
+        this.addMenuItem("3", "구간 관리", () -> {
+        });
+        this.addMenuItem("4", "지하철 노선도 출력", () -> {
+        });
         this.addMenuItem("Q", "종료", this::close);
     }
 }
@@ -750,7 +756,7 @@ public interface Service {
 }
 ```
 
-비즈니스 인터페이스 Service 정의. 
+비즈니스 인터페이스 Service 정의.
 
 ```java
 // StationService.java
@@ -843,8 +849,10 @@ public class StationMenu extends Menu<StationViewController> {
 
     @Override
     protected void setup() {
-        this.addMenuItem("1", "역 등록", ()->{});
-        this.addMenuItem("2", "역 삭제", ()->{});
+        this.addMenuItem("1", "역 등록", () -> {
+        });
+        this.addMenuItem("2", "역 삭제", () -> {
+        });
         this.addMenuItem("3", "역 조회", this.viewController::printStationNameAll);
         this.addMenuItem("B", "돌아가기", this::close);
     }
@@ -996,13 +1004,13 @@ public class View {
                 Console.printHeader(REQUEST_COMMAND_QUERY);
                 command = Console.readline();
                 return this.menu.select(command);
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 Console.printNextLine();
                 Console.printError(e.getMessage());
             } finally {
                 Console.printNextLine();
             }
-        } while(true);
+        } while (true);
     }
 }
 ```
@@ -1106,7 +1114,7 @@ import subway.view.View;
 
 public class StationViewController implements ViewController {
     private final StationController stationController = new StationController();
-    
+
     public void registerStation() {
         Console.printHeader("등록할 역 이름을 입력하세요.");
         String name = Console.readline();
@@ -1142,8 +1150,94 @@ public class StationMenu extends Menu<StationViewController> {
 
 역 등록 기능 구현.
 
+## 17. 역 삭제
 
+```java
+// StationService.java
 
+package subway.service;
 
+import java.util.List;
+
+import subway.domain.Station;
+import subway.repository.StationRepository;
+
+public class StationService implements Service {
+    public void deleteStation(Station station) {
+        StationRepository.deleteStation(station.getName());
+    }
+}
+```
+
+```java
+// StationController.java
+
+package subway.controller;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.domain.Station;
+import subway.service.StationService;
+
+public class StationController implements Controller {
+    private final StationService stationService = new StationService();
+
+    public void deleteStation(String name) {
+        Station station = new Station(name);
+        stationService.deleteStation(station);
+    }
+}
+```
+
+역 삭제 Controller, Service 기능 생성.
+
+```java
+// StationViewController.java
+
+package subway.controller;
+
+import java.util.List;
+
+import subway.menu.StationMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class StationViewController implements ViewController {
+    private final StationController stationController = new StationController();
+
+    public void removeStation() {
+        Console.printHeader("삭제할 역 이름을 입력하세요");
+        String name = Console.readline();
+        Console.printNextLine();
+        stationController.deleteStation(name);
+        Console.printInfo("지하철 역이 삭제되었습니다.");
+    }
+}
+```
+
+```java
+// StationMenu.java
+
+package subway.menu;
+
+import subway.controller.StationViewController;
+
+public class StationMenu extends Menu<StationViewController> {
+    public StationMenu(StationViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 등록", () -> this.handleSelectAfterClose(this.viewController::registerStation));
+        this.addMenuItem("2", "역 삭제", () -> this.handleSelectAfterClose(this.viewController::removeStation));
+        this.addMenuItem("3", "역 조회", () -> this.handleSelectAfterClose(this.viewController::printStationNameAll));
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+역 삭제 기능 구현.
 
 
