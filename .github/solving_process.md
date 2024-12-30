@@ -1240,4 +1240,153 @@ public class StationMenu extends Menu<StationViewController> {
 
 역 삭제 기능 구현.
 
+## 18. 역 Entity, DTO 분리
+
+```java
+package subway.domain;
+
+import subway.dto.DefaultDTO;
+
+public interface Entity<T extends DefaultDTO> {
+    T toDTO();
+}
+```
+
+```java
+// DefaultDTO.java
+
+package subway.dto;
+
+import subway.domain.Entity;
+
+public interface DefaultDTO<T extends Entity> {
+    T toEntity();
+}
+```
+
+Entity, DTO 인터페이스 생성.
+
+```java
+// Station.java
+
+package subway.domain;
+
+import subway.dto.StationDTO;
+
+public class Station implements Entity<StationDTO> {
+    private final String name;
+
+    public Station(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public StationDTO toDTO() {
+        return new StationDTO(this.name);
+    }
+}
+```
+
+```java
+// StationDTO.java
+
+
+package subway.dto;
+
+import subway.domain.Station;
+
+public class StationDTO implements DefaultDTO<Station> {
+    private String name;
+
+    public StationDTO() {
+    }
+
+    public StationDTO(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Station toEntity() {
+        return new Station(this.name);
+    }
+}
+```
+
+역 Entity, DTO 구현.
+
+```java
+// StationController.java
+
+package subway.controller;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.dto.StationDTO;
+import subway.service.StationService;
+
+public class StationController implements Controller {
+    private final StationService stationService = new StationService();
+
+    public List<String> selectStationNameList() {
+        List<StationDTO> stationList = stationService.selectStationList();
+        return stationList.stream().map(StationDTO::getName).collect(Collectors.toList());
+    }
+
+    public void insertStation(String name) {
+        StationDTO stationDTO = new StationDTO(name);
+        stationService.insertStation(stationDTO);
+    }
+
+    public void deleteStation(String name) {
+        StationDTO stationDTO = new StationDTO(name);
+        stationService.deleteStation(stationDTO);
+    }
+}
+```
+
+```java
+// StationService.java
+
+package subway.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.domain.Station;
+import subway.dto.StationDTO;
+import subway.repository.StationRepository;
+
+public class StationService implements Service {
+    public List<StationDTO> selectStationList() {
+        return StationRepository.stations().stream().map(Station::toDTO).collect(Collectors.toList());
+    }
+
+    public void insertStation(StationDTO stationDTO) {
+        Station station = stationDTO.toEntity();
+        StationRepository.addStation(station);
+    }
+
+    public void deleteStation(StationDTO stationDTO) {
+        Station station = stationDTO.toEntity();
+        StationRepository.deleteStation(station.getName());
+    }
+}
+```
+
+Entity 아닌 DTO 로 전달. 
+
+
 
