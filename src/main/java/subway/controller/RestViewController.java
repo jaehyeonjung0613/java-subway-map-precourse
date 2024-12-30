@@ -16,6 +16,7 @@ public class RestViewController {
                 handler.run();
             } catch (IllegalArgumentException e) {
                 Console.printError(e.getMessage());
+                Console.printNextLine();
             }
         } while (!view.isClose());
         Console.printNextLine();
