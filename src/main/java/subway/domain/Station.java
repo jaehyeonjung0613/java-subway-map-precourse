@@ -1,7 +1,9 @@
 package subway.domain;
 
-public class Station {
-    private String name;
+import subway.dto.StationDTO;
+
+public class Station implements Entity<StationDTO> {
+    private final String name;
 
     public Station(String name) {
         this.name = name;
@@ -11,5 +13,8 @@ public class Station {
         return name;
     }
 
-    // 추가 기능 구현
+    @Override
+    public StationDTO toDTO() {
+        return new StationDTO(this.name);
+    }
 }
