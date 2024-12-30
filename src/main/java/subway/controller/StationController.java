@@ -13,4 +13,9 @@ public class StationController implements Controller {
         List<Station> stationList = stationService.selectStationList();
         return stationList.stream().map(Station::getName).collect(Collectors.toList());
     }
+
+    public void insertStation(String name) {
+        Station station = new Station(name);
+        stationService.insertStation(station);
+    }
 }

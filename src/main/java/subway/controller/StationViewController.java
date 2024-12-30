@@ -22,4 +22,12 @@ public class StationViewController implements ViewController {
             Console.printInfo(stationName);
         }
     }
+
+    public void registerStation() {
+        Console.printHeader("등록할 역 이름을 입력하세요.");
+        String name = Console.readline();
+        Console.printNextLine();
+        stationController.insertStation(name);
+        Console.printInfo("지하철 역이 등록되었습니다.");
+    }
 }

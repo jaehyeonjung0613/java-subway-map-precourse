@@ -1,12 +1,17 @@
 package subway.service;
 
+import static subway.repository.StationRepository.*;
+
 import java.util.List;
 
 import subway.domain.Station;
-import subway.repository.StationRepository;
 
 public class StationService implements Service {
     public List<Station> selectStationList() {
-        return StationRepository.stations();
+        return stations();
+    }
+
+    public void insertStation(Station station) {
+        addStation(station);
     }
 }
