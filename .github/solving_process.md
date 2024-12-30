@@ -1041,6 +1041,106 @@ public class RestViewController {
 
 직접 handler 호출하도록 변경.
 
+## 16. 역 등록
+
+```java
+// StationService.java
+
+package subway.service;
+
+import static subway.repository.StationRepository.*;
+
+import java.util.List;
+
+import subway.domain.Station;
+
+public class StationService implements Service {
+    public List<Station> selectStationList() {
+        return stations();
+    }
+
+    public void insertStation(Station station) {
+        addStation(station);
+    }
+}
+```
+
+```java
+// StationController.java
+
+package subway.controller;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.domain.Station;
+import subway.service.StationService;
+
+public class StationController implements Controller {
+    private final StationService stationService = new StationService();
+
+    public List<String> selectStationNameList() {
+        List<Station> stationList = stationService.selectStationList();
+        return stationList.stream().map(Station::getName).collect(Collectors.toList());
+    }
+
+    public void insertStation(String name) {
+        Station station = new Station(name);
+        stationService.insertStation(station);
+    }
+}
+```
+
+역 등록 Controller, Service 기능 생성.
+
+```java
+// StationViewController.java
+
+package subway.controller;
+
+import java.util.List;
+
+import subway.menu.StationMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class StationViewController implements ViewController {
+    private final StationController stationController = new StationController();
+    
+    public void registerStation() {
+        Console.printHeader("등록할 역 이름을 입력하세요.");
+        String name = Console.readline();
+        Console.printNextLine();
+        stationController.insertStation(name);
+        Console.printInfo("지하철 역이 등록되었습니다.");
+    }
+}
+```
+
+```java
+// StationMenu.java
+
+package subway.menu;
+
+import subway.controller.StationViewController;
+
+public class StationMenu extends Menu<StationViewController> {
+    public StationMenu(StationViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 등록", () -> this.handleSelectAfterClose(this.viewController::registerStation));
+        this.addMenuItem("2", "역 삭제", () -> {
+        });
+        this.addMenuItem("3", "역 조회", () -> this.handleSelectAfterClose(this.viewController::printStationNameAll));
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+역 등록 기능 구현.
 
 
 
