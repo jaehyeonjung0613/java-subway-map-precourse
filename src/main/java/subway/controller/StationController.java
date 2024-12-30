@@ -18,4 +18,9 @@ public class StationController implements Controller {
         Station station = new Station(name);
         stationService.insertStation(station);
     }
+
+    public void deleteStation(String name) {
+        Station station = new Station(name);
+        stationService.deleteStation(station);
+    }
 }

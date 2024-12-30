@@ -30,4 +30,12 @@ public class StationViewController implements ViewController {
         stationController.insertStation(name);
         Console.printInfo("지하철 역이 등록되었습니다.");
     }
+
+    public void removeStation() {
+        Console.printHeader("삭제할 역 이름을 입력하세요");
+        String name = Console.readline();
+        Console.printNextLine();
+        stationController.deleteStation(name);
+        Console.printInfo("지하철 역이 삭제되었습니다.");
+    }
 }
