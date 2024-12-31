@@ -1937,3 +1937,127 @@ public class LineMenu extends Menu<LineViewController> {
 ```
 
 노선 삭제 기능 구현.
+
+## 25. 노선 Entity, DTO 분리
+
+```java
+// Line.java
+
+package subway.domain;
+
+import subway.dto.LineDTO;
+
+public class Line implements Entity<LineDTO> {
+    private final String name;
+
+    public Line(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public LineDTO toDTO() {
+        return new LineDTO(this.name);
+    }
+}
+```
+
+```java
+// LineDTO.java
+
+package subway.dto;
+
+import subway.domain.Line;
+
+public class LineDTO implements DefaultDTO<Line> {
+    private String name;
+
+    public LineDTO() {
+    }
+
+    public LineDTO(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Line toEntity() {
+        return new Line(this.name);
+    }
+}
+```
+
+노선 Entity, DTO 구현.
+
+```java
+// LineController.java
+
+package subway.menu;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.controller.Controller;
+import subway.dto.LineDTO;
+import subway.service.LineService;
+
+public class LineController implements Controller {
+    private final LineService lineService = new LineService();
+
+    public List<String> selectLineNameList() {
+        List<LineDTO> stationList = lineService.selectLineList();
+        return stationList.stream().map(LineDTO::getName).collect(Collectors.toList());
+    }
+
+    public void insertLine(String name) {
+        LineDTO lineDTO = new LineDTO(name);
+        lineService.insertLine(lineDTO);
+    }
+
+    public void deleteLine(String name) {
+        LineDTO lineDTO = new LineDTO(name);
+        lineService.deleteLine(lineDTO);
+    }
+}
+```
+
+```java
+// LineService.java
+
+package subway.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.domain.Line;
+import subway.dto.LineDTO;
+import subway.repository.LineRepository;
+
+public class LineService implements Service {
+    public List<LineDTO> selectLineList() {
+        return LineRepository.lines().stream().map(Line::toDTO).collect(Collectors.toList());
+    }
+
+    public void insertLine(LineDTO lineDTO) {
+        Line line = lineDTO.toEntity();
+        LineRepository.addLine(line);
+    }
+
+    public void deleteLine(LineDTO lineDTO) {
+        Line line = lineDTO.toEntity();
+        LineRepository.deleteLineByName(line.getName());
+    }
+}
+```
+
+Entity 아닌 DTO 로 전달.
