@@ -1295,7 +1295,6 @@ public class Station implements Entity<StationDTO> {
 ```java
 // StationDTO.java
 
-
 package subway.dto;
 
 import subway.domain.Station;
@@ -1508,4 +1507,97 @@ public class StationService implements Service {
 ```
 
 역 등록 및 삭제시 미존재, 존재 유효성 체크.
+
+## 20. 노선 관리 화면 출력
+
+```java
+// LineViewController.java
+
+package subway.controller;
+
+import subway.menu.LineMenu;
+import subway.view.View;
+
+public class LineViewController implements ViewController {
+    @Override
+    public View make() {
+        LineMenu menu = new LineMenu(this);
+        return new View("노선 관리 화면", menu);
+    }
+}
+```
+
+```java
+// LineMenu.java
+
+package subway.menu;
+
+import subway.controller.LineViewController;
+
+public class LineMenu extends Menu<LineViewController> {
+    public LineMenu(LineViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "노선 등록", () -> {
+        });
+        this.addMenuItem("2", "노선 삭제", () -> {
+        });
+        this.addMenuItem("3", "노선 조회", () -> {
+        });
+        this.addMenuItem("B", "돌아가기", this::close);
+
+    }
+}
+```
+
+Line View 및 Menu 생성.
+
+```java
+// MainViewController.java
+
+package subway.controller;
+
+import subway.menu.MainMenu;
+import subway.view.View;
+
+public class MainViewController implements ViewController {
+    private final LineViewController lineViewController = new LineViewController();
+
+    public void openLineView() {
+        RestViewController.execute(lineViewController);
+    }
+}
+```
+
+Line View 실행 기능 생성.
+
+```java
+// MainMenu.java
+
+package subway.menu;
+
+import subway.controller.MainViewController;
+
+public class MainMenu extends Menu<MainViewController> {
+    public MainMenu(MainViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 관리", this.viewController::openStationView);
+        this.addMenuItem("2", "노선 관리", this.viewController::openLineView);
+        this.addMenuItem("3", "구간 관리", () -> {
+        });
+        this.addMenuItem("4", "지하철 노선도 출력", () -> {
+        });
+        this.addMenuItem("Q", "종료", this::close);
+    }
+}
+```
+
+Line View 실행 메뉴 항목과 매핑.
 
