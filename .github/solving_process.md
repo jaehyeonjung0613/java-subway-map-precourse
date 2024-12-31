@@ -1601,3 +1601,104 @@ public class MainMenu extends Menu<MainViewController> {
 
 Line View 실행 메뉴 항목과 매핑.
 
+## 21. 노선 조회
+
+```java
+// LineService.java
+
+package subway.service;
+
+import java.util.List;
+
+import subway.domain.Line;
+import subway.repository.LineRepository;
+
+public class LineService implements Service {
+    public List<Line> selectLineList() {
+        return LineRepository.lines();
+    }
+}
+```
+
+Line 목록 반환 기능 생성.
+
+```java
+// LineController.java
+
+package subway.menu;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.controller.Controller;
+import subway.domain.Line;
+import subway.service.LineService;
+
+public class LineController implements Controller {
+    private final LineService lineService = new LineService();
+
+    public List<String> selectLineNameList() {
+        List<Line> stationList = lineService.selectLineList();
+        return stationList.stream().map(Line::getName).collect(Collectors.toList());
+    }
+}
+```
+
+Line 명 목록 반환 기능 생성.
+
+```java
+// LineViewController.java
+
+package subway.controller;
+
+import java.util.List;
+
+import subway.menu.LineController;
+import subway.menu.LineMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class LineViewController implements ViewController {
+    private final LineController lineController = new LineController();
+
+    @Override
+    public View make() {
+        LineMenu menu = new LineMenu(this);
+        return new View("노선 관리 화면", menu);
+    }
+
+    public void printLineNameAll() {
+        Console.printHeader("역 목록");
+        List<String> lineNameList = lineController.selectLineNameList();
+        for (String lineName : lineNameList) {
+            Console.printInfo(lineName);
+        }
+    }
+}
+```
+
+```java
+// LineMenu.java
+
+package subway.menu;
+
+import subway.controller.LineViewController;
+
+public class LineMenu extends Menu<LineViewController> {
+    public LineMenu(LineViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "노선 등록", () -> {
+        });
+        this.addMenuItem("2", "노선 삭제", () -> {
+        });
+        this.addMenuItem("3", "노선 조회", () -> this.handleSelectAfterClose(this.viewController::printLineNameAll));
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+노선 목록 조회 구현.
