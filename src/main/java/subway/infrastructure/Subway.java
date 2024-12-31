@@ -2,6 +2,7 @@ package subway.infrastructure;
 
 import subway.controller.MainViewController;
 import subway.controller.RestViewController;
+import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 
 public class Subway {
@@ -22,6 +23,7 @@ public class Subway {
 
     private void init() {
         StationRepository.init();
+        LineRepository.init();
     }
 
     public void run() {
