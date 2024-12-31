@@ -2059,3 +2059,127 @@ public class LineService implements Service {
 ```
 
 Entity 아닌 DTO 로 전달.
+
+## 26. 노선 관리 유효성 체크
+
+```java
+// LineConstants.java
+
+package subway.domain;
+
+public final class LineConstants {
+    private LineConstants() {
+    }
+
+    public static final int MIN_NAME_LENGTH = 2;
+
+    public static final String EMPTY_NAME_MESSAGE = "지하철 역 이름은 필수로 입력되어야합니다.";
+    public static final String LESS_NAME_LENGTH_FORMAT = "지하철 역 이름은 %d글자 이상이어야 합니다.";
+}
+```
+
+```java
+// Line.java
+
+package subway.domain;
+
+import static subway.domain.LineConstants.*;
+
+import subway.dto.LineDTO;
+
+public class Line implements Entity<LineDTO> {
+    private final String name;
+
+    public Line(String name) {
+        this.validateName(name);
+        this.name = name;
+    }
+
+    private void validateName(String name) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException(EMPTY_NAME_MESSAGE);
+        }
+        if (name.length() < MIN_NAME_LENGTH) {
+            throw new IllegalArgumentException(String.format(LESS_NAME_LENGTH_FORMAT, MIN_NAME_LENGTH));
+        }
+    }
+}
+```
+
+노선 이름 관련 유효성 체크.
+
+```java
+// LineRepository.java
+
+package subway.repository;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import subway.domain.Line;
+
+public class LineRepository {
+    private static final List<Line> lines = new ArrayList<>();
+    
+    public static Optional<Line> selectByName(String name) {
+        return lines.stream().filter(line -> Objects.equals(line.getName(), name)).findFirst();
+    }
+}
+```
+
+```java
+// LineServiceConstants.java
+
+package subway.service;
+
+public final class LineServiceConstants {
+    private LineServiceConstants() {
+    }
+
+    public static final String ALREADY_EXISTS_LINE_NAME_MESSAGE = "이미 등록된 노선 이름입니다.";
+    public static final String NOT_EXISTS_LINE_NAME_MESSAGE = "존재하지 않은 노선 이름입니다.";
+}
+```
+
+```java
+// LineService.java
+
+package subway.service;
+
+import static subway.service.LineServiceConstants.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import subway.domain.Line;
+import subway.dto.LineDTO;
+import subway.repository.LineRepository;
+
+public class LineService implements Service {
+    public List<LineDTO> selectLineList() {
+        return LineRepository.lines().stream().map(Line::toDTO).collect(Collectors.toList());
+    }
+
+    public void insertLine(LineDTO lineDTO) {
+        Line line = lineDTO.toEntity();
+        Optional<Line> optionalLine = LineRepository.selectByName(line.getName());
+        optionalLine.ifPresent((existedLine) -> {
+            throw new IllegalArgumentException(ALREADY_EXISTS_LINE_NAME_MESSAGE);
+        });
+        LineRepository.addLine(line);
+    }
+
+    public void deleteLine(LineDTO lineDTO) {
+        Line line = lineDTO.toEntity();
+        Optional<Line> optionalLine = LineRepository.selectByName(line.getName());
+        optionalLine.orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LINE_NAME_MESSAGE));
+        LineRepository.deleteLineByName(line.getName());
+    }
+}
+```
+
+노선 등록 및 삭제시 미존재, 존재 유효성 체크.
