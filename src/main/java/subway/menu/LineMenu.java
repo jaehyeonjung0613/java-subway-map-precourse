@@ -9,8 +9,7 @@ public class LineMenu extends Menu<LineViewController> {
 
     @Override
     protected void setup() {
-        this.addMenuItem("1", "노선 등록", () -> {
-        });
+        this.addMenuItem("1", "노선 등록", () -> this.handleSelectAfterClose(this.viewController::registerLine));
         this.addMenuItem("2", "노선 삭제", () -> {
         });
         this.addMenuItem("3", "노선 조회", () -> this.handleSelectAfterClose(this.viewController::printLineNameAll));

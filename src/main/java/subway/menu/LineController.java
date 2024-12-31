@@ -14,4 +14,9 @@ public class LineController implements Controller {
         List<Line> stationList = lineService.selectLineList();
         return stationList.stream().map(Line::getName).collect(Collectors.toList());
     }
+
+    public void insertLine(String name) {
+        Line line = new Line(name);
+        lineService.insertLine(line);
+    }
 }

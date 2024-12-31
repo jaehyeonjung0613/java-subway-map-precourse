@@ -9,4 +9,8 @@ public class LineService implements Service {
     public List<Line> selectLineList() {
         return LineRepository.lines();
     }
+
+    public void insertLine(Line line) {
+        LineRepository.addLine(line);
+    }
 }
