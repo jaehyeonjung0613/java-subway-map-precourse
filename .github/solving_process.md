@@ -1702,3 +1702,54 @@ public class LineMenu extends Menu<LineViewController> {
 ```
 
 노선 목록 조회 구현.
+
+## 22. 노선 데이터 초기화
+
+```java
+// LineRepository.java
+
+package subway.repository;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+import subway.domain.Line;
+import subway.domain.Line;
+
+public class LineRepository {
+    public static void init() {
+        addLine(new Line("2호선"));
+        addLine(new Line("3호선"));
+        addLine(new Line("신분당선"));
+    }
+}
+```
+
+기초 데이터 초기화.
+
+```java
+// Subway.java
+
+package subway.infrastructure;
+
+import subway.controller.MainViewController;
+import subway.controller.RestViewController;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
+
+public class Subway {
+    private void init() {
+        StationRepository.init();
+        LineRepository.init();
+    }
+
+    public void run() {
+        this.init();
+        RestViewController.execute(mainViewController);
+    }
+}
+```
+
+애플리케이션 구동시 노선 기초 데이터 초기화.
