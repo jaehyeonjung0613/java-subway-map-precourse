@@ -13,4 +13,8 @@ public class LineService implements Service {
     public void insertLine(Line line) {
         LineRepository.addLine(line);
     }
+
+    public void deleteLine(Line line) {
+        LineRepository.deleteLineByName(line.getName());
+    }
 }

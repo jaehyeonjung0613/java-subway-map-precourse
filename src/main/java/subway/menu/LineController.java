@@ -19,4 +19,9 @@ public class LineController implements Controller {
         Line line = new Line(name);
         lineService.insertLine(line);
     }
+
+    public void deleteLine(String name) {
+        Line line = new Line(name);
+        lineService.deleteLine(line);
+    }
 }

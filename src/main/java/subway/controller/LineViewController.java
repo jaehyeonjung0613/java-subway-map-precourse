@@ -31,4 +31,12 @@ public class LineViewController implements ViewController {
         lineController.insertLine(name);
         Console.printInfo("지하철 노선이 등록되었습니다.");
     }
+
+    public void removeLine() {
+        Console.printHeader("삭제할 노선 이름을 입력하세요");
+        String name = Console.readline();
+        Console.printNextLine();
+        lineController.deleteLine(name);
+        Console.printInfo("지하철 노선이 삭제되었습니다.");
+    }
 }
