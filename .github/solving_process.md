@@ -1625,7 +1625,7 @@ Line 목록 반환 기능 생성.
 ```java
 // LineController.java
 
-package subway.menu;
+package subway.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1653,7 +1653,6 @@ package subway.controller;
 
 import java.util.List;
 
-import subway.menu.LineController;
 import subway.menu.LineMenu;
 import subway.ui.Console;
 import subway.view.View;
@@ -1776,7 +1775,7 @@ public class LineService implements Service {
 ```java
 // LineController.java
 
-package subway.menu;
+package subway.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1868,7 +1867,7 @@ public class LineService implements Service {
 ```java
 // LineController.java
 
-package subway.menu;
+package subway.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1896,7 +1895,6 @@ package subway.controller;
 
 import java.util.List;
 
-import subway.menu.LineController;
 import subway.menu.LineMenu;
 import subway.ui.Console;
 import subway.view.View;
@@ -2002,7 +2000,7 @@ public class LineDTO implements DefaultDTO<Line> {
 ```java
 // LineController.java
 
-package subway.menu;
+package subway.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;

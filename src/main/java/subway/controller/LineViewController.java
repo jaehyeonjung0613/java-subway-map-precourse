@@ -2,7 +2,6 @@ package subway.controller;
 
 import java.util.List;
 
-import subway.menu.LineController;
 import subway.menu.LineMenu;
 import subway.ui.Console;
 import subway.view.View;

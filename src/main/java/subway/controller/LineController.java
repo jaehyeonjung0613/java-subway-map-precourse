@@ -1,9 +1,8 @@
-package subway.menu;
+package subway.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import subway.controller.Controller;
 import subway.dto.LineDTO;
 import subway.service.LineService;
 
