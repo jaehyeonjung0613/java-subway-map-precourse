@@ -1753,3 +1753,95 @@ public class Subway {
 ```
 
 애플리케이션 구동시 노선 기초 데이터 초기화.
+
+## 23. 노선 등록
+
+```java
+// LineService.java
+
+package subway.service;
+
+import java.util.List;
+
+import subway.domain.Line;
+import subway.repository.LineRepository;
+
+public class LineService implements Service {
+    public void insertLine(Line line) {
+        LineRepository.addLine(line);
+    }
+}
+```
+
+```java
+// LineController.java
+
+package subway.menu;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.controller.Controller;
+import subway.domain.Line;
+import subway.service.LineService;
+
+public class LineController implements Controller {
+    private final LineService lineService = new LineService();
+
+    public void insertLine(String name) {
+        Line line = new Line(name);
+        lineService.insertLine(line);
+    }
+}
+```
+
+노선 등록 Controller, Service 기능 생성.
+
+```java
+// LineViewController.java
+
+package subway.controller;
+
+import java.util.List;
+
+import subway.menu.StationMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class StationViewController implements ViewController {
+    private final StationController stationController = new StationController();
+
+    public void registerStation() {
+        Console.printHeader("등록할 역 이름을 입력하세요.");
+        String name = Console.readline();
+        Console.printNextLine();
+        stationController.insertStation(name);
+        Console.printInfo("지하철 역이 등록되었습니다.");
+    }
+}
+```
+
+```java
+// LineMenu.java
+
+package subway.menu;
+
+import subway.controller.LineViewController;
+
+public class LineMenu extends Menu<LineViewController> {
+    public LineMenu(LineViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "노선 등록", () -> this.handleSelectAfterClose(this.viewController::registerLine));
+        this.addMenuItem("2", "노선 삭제", () -> {
+        });
+        this.addMenuItem("3", "노선 조회", () -> this.handleSelectAfterClose(this.viewController::printLineNameAll));
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+노선 등록 기능 구현.
