@@ -5,6 +5,7 @@ import subway.view.View;
 
 public class MainViewController implements ViewController {
     private final StationViewController stationViewController = new StationViewController();
+    private final LineViewController lineViewController = new LineViewController();
 
     @Override
     public View make() {
@@ -14,5 +15,9 @@ public class MainViewController implements ViewController {
 
     public void openStationView() {
         RestViewController.execute(stationViewController);
+    }
+
+    public void openLineView() {
+        RestViewController.execute(lineViewController);
     }
 }
