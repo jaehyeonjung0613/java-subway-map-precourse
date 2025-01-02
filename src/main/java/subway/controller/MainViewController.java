@@ -6,6 +6,7 @@ import subway.view.View;
 public class MainViewController implements ViewController {
     private final StationViewController stationViewController = new StationViewController();
     private final LineViewController lineViewController = new LineViewController();
+    private final SectionViewController sectionViewController = new SectionViewController();
 
     @Override
     public View make() {
@@ -19,5 +20,9 @@ public class MainViewController implements ViewController {
 
     public void openLineView() {
         RestViewController.execute(lineViewController);
+    }
+
+    public void openSectionView() {
+        RestViewController.execute(sectionViewController);
     }
 }
