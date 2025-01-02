@@ -34,6 +34,10 @@ public class Station implements Entity<StationDTO> {
         this.lineList.add(line);
     }
 
+    public void removeLine(Line line) {
+        this.lineList.remove(line);
+    }
+
     @Override
     public StationDTO toDTO() {
         return new StationDTO(this.name);

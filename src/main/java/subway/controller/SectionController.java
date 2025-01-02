@@ -13,4 +13,10 @@ public class SectionController implements Controller {
         int position = Integer.parseInt(_position);
         sectionService.insertSection(lineDTO, stationDTO, position);
     }
+
+    public void deleteSection(String lineName, String stationName) {
+        LineDTO lineDTO = new LineDTO(lineName);
+        StationDTO stationDTO = new StationDTO(stationName);
+        sectionService.deleteSection(lineDTO, stationDTO);
+    }
 }

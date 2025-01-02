@@ -39,6 +39,11 @@ public class Line implements Entity<LineDTO> {
         this.insertStation(this.stationList.size(), station);
     }
 
+    public void removeStation(Station station) {
+        station.removeLine(this);
+        this.stationList.remove(station);
+    }
+
     @Override
     public LineDTO toDTO() {
         return new LineDTO(this.name);

@@ -13,4 +13,10 @@ public class SectionService implements Service {
         Station station = StationRepository.selectByName(stationDTO.getName()).get();
         line.insertStation(position, station);
     }
+
+    public void deleteSection(LineDTO lineDTO, StationDTO stationDTO) {
+        Line line = LineRepository.selectByName(lineDTO.getName()).get();
+        Station station = StationRepository.selectByName(stationDTO.getName()).get();
+        line.removeStation(station);
+    }
 }

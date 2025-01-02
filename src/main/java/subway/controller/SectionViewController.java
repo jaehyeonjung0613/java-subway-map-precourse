@@ -26,4 +26,15 @@ public class SectionViewController implements ViewController {
         sectionController.insertSection(lienName, stationName, position);
         Console.printInfo("구간이 등록되었습니다.");
     }
+
+    public void removeSection() {
+        Console.printHeader("삭제할 구간의 노선을 입력하세요.");
+        String lienName = Console.readline();
+        Console.printNextLine();
+        Console.printHeader("삭제할 구간의 역을 입력하세요.");
+        String stationName = Console.readline();
+        Console.printNextLine();
+        sectionController.deleteSection(lienName, stationName);
+        Console.printInfo("구간이 삭제되었습니다.");
+    }
 }
