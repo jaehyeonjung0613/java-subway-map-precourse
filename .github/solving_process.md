@@ -2183,3 +2183,92 @@ public class LineService implements Service {
 ```
 
 노선 등록 및 삭제시 미존재, 존재 유효성 체크.
+
+## 27. 구간 관리 화면 출력
+
+```java
+// SectionViewController.java
+
+package subway.controller;
+
+import subway.menu.SectionMenu;
+import subway.view.View;
+
+public class SectionViewController implements ViewController {
+    @Override
+    public View make() {
+        SectionMenu menu = new SectionMenu(this);
+        return new View("구간 관리 화면", menu);
+    }
+}
+```
+
+```java
+// SectionMenu.java
+
+package subway.menu;
+
+import subway.controller.SectionViewController;
+
+public class SectionMenu extends Menu<SectionViewController> {
+    public SectionMenu(SectionViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "구간 등록", () -> {
+        });
+        this.addMenuItem("2", "구간 삭제", () -> {
+        });
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+Section View 및 Menu 생성.
+
+```java
+// MainViewController.java
+
+package subway.controller;
+
+import subway.menu.MainMenu;
+import subway.view.View;
+
+public class MainViewController implements ViewController {
+    private final SectionViewController sectionViewController = new SectionViewController();
+
+    public void openSectionView() {
+        RestViewController.execute(sectionViewController);
+    }
+}
+```
+
+Section View 실행 기능 생성.
+
+```java
+// MainMenu.java
+
+package subway.menu;
+
+import subway.controller.MainViewController;
+
+public class MainMenu extends Menu<MainViewController> {
+    public MainMenu(MainViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 관리", this.viewController::openStationView);
+        this.addMenuItem("2", "노선 관리", this.viewController::openLineView);
+        this.addMenuItem("3", "구간 관리", this.viewController::openSectionView);
+        this.addMenuItem("4", "지하철 노선도 출력", () -> {
+        });
+        this.addMenuItem("Q", "종료", this::close);
+    }
+}
+```
+
+Section View 실행 메뉴 항목과 매핑.
