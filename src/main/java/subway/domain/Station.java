@@ -2,14 +2,19 @@ package subway.domain;
 
 import static subway.domain.StationConstants.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import subway.dto.StationDTO;
 
 public class Station implements Entity<StationDTO> {
     private final String name;
+    private final List<Line> lineList;
 
     public Station(String name) throws IllegalArgumentException {
         validateName(name);
         this.name = name;
+        this.lineList = new ArrayList<>();
     }
 
     private void validateName(String name) throws IllegalArgumentException {
@@ -23,6 +28,10 @@ public class Station implements Entity<StationDTO> {
 
     public String getName() {
         return name;
+    }
+
+    public void addLine(Line line) {
+        this.lineList.add(line);
     }
 
     @Override
