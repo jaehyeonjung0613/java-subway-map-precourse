@@ -2451,3 +2451,137 @@ public class SectionMenu extends Menu<SectionViewController> {
 ```
 
 구간 등록 기능 구현.
+
+## 29. 구간 삭제
+
+```java
+// Station.java
+
+package subway.domain;
+
+import static subway.domain.StationConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.dto.StationDTO;
+
+public class Station implements Entity<StationDTO> {
+    public void removeLine(Line line) {
+        this.lineList.remove(line);
+    }
+}
+```
+
+```java
+// Line.java
+
+package subway.domain;
+
+import static subway.domain.LineConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.dto.LineDTO;
+
+public class Line implements Entity<LineDTO> {
+    public void removeStation(Station station) {
+        station.removeLine(this);
+        this.stationList.remove(station);
+    }
+}
+```
+
+Station, Line 목록 제거 기능 생성.
+
+```java
+// SectionService.java
+
+package subway.service;
+
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
+
+public class SectionService implements Service {
+    public void deleteSection(LineDTO lineDTO, StationDTO stationDTO) {
+        Line line = LineRepository.selectByName(lineDTO.getName()).get();
+        Station station = StationRepository.selectByName(stationDTO.getName()).get();
+        line.removeStation(station);
+    }
+}
+```
+
+```java
+// SectionController.java
+
+package subway.controller;
+
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.service.SectionService;
+
+public class SectionController implements Controller {
+    private final SectionService sectionService = new SectionService();
+    
+    public void deleteSection(String lineName, String stationName) {
+        LineDTO lineDTO = new LineDTO(lineName);
+        StationDTO stationDTO = new StationDTO(stationName);
+        sectionService.deleteSection(lineDTO, stationDTO);
+    }
+}
+```
+
+구간 삭제 Controller, Service 기능 생성.
+
+```java
+// SectionViewController.java
+
+package subway.controller;
+
+import subway.menu.SectionMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class SectionViewController implements ViewController {
+    private final SectionController sectionController = new SectionController();
+    
+    public void removeSection() {
+        Console.printHeader("삭제할 구간의 노선을 입력하세요.");
+        String lienName = Console.readline();
+        Console.printNextLine();
+        Console.printHeader("삭제할 구간의 역을 입력하세요.");
+        String stationName = Console.readline();
+        Console.printNextLine();
+        sectionController.deleteSection(lienName, stationName);
+        Console.printInfo("구간이 삭제되었습니다.");
+    }
+}
+```
+
+```java
+// LineMenu.java
+
+package subway.menu;
+
+import subway.controller.SectionViewController;
+
+public class SectionMenu extends Menu<SectionViewController> {
+    public SectionMenu(SectionViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "구간 등록", () -> this.handleSelectAfterClose(this.viewController::registerSection));
+        this.addMenuItem("2", "구간 삭제", () -> this.handleSelectAfterClose(this.viewController::removeSection));
+        this.addMenuItem("B", "돌아가기", this::close);
+    }
+}
+```
+
+구간 삭제 기능 구현.
