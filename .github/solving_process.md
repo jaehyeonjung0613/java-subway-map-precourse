@@ -2984,4 +2984,62 @@ public class LineViewController implements ViewController {
 
 노선 등록시 상행, 하행 입력 절차 추가.
 
+## 33. 구간 데이터 초기화
+
+```java
+// SectionRepository.java
+
+package subway.repository;
+
+import subway.domain.Line;
+import subway.domain.Station;
+
+public class SectionRepository {
+    public static void init() {
+        generate("2호선", "교대역", "강남역", "역삼역");
+        generate("3호선", "교대역", "남부터미널역", "양재역", "매봉역");
+        generate("신분당선", "강남역", "양재역", "양재시민의숲역");
+    }
+
+    private static void generate(String lineName, String... stationNames) {
+        Line line = LineRepository.selectByName(lineName).get();
+        Station station;
+        for (String stationName : stationNames) {
+            station = StationRepository.selectByName(stationName).get();
+            line.addStation(station);
+        }
+    }
+}
+```
+
+기초 데이터 초기화.
+
+```java
+// Subway.java
+
+
+package subway.infrastructure;
+
+import subway.controller.MainViewController;
+import subway.controller.RestViewController;
+import subway.repository.LineRepository;
+import subway.repository.SectionRepository;
+import subway.repository.StationRepository;
+
+public class Subway {
+    private void init() {
+        StationRepository.init();
+        LineRepository.init();
+        SectionRepository.init();
+    }
+
+    public void run() {
+        this.init();
+        RestViewController.execute(mainViewController);
+    }
+}
+```
+
+애플리케이션 구동시 구간 기초 데이터 초기화.
+
 
