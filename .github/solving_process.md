@@ -1878,7 +1878,7 @@ import subway.service.LineService;
 
 public class LineController implements Controller {
     private final LineService lineService = new LineService();
-    
+
     public void deleteLine(String name) {
         Line line = new Line(name);
         lineService.deleteLine(line);
@@ -2123,7 +2123,7 @@ import subway.domain.Line;
 
 public class LineRepository {
     private static final List<Line> lines = new ArrayList<>();
-    
+
     public static Optional<Line> selectByName(String name) {
         return lines.stream().filter(line -> Objects.equals(line.getName(), name)).findFirst();
     }
@@ -2305,7 +2305,7 @@ public class Station implements Entity<StationDTO> {
             throw new IllegalArgumentException(String.format(LESS_NAME_LENGTH_FORMAT, MIN_NAME_LENGTH));
         }
     }
-    
+
     public void addLine(Line line) {
         this.lineList.add(line);
     }
@@ -2342,7 +2342,7 @@ public class Line implements Entity<LineDTO> {
             throw new IllegalArgumentException(String.format(LESS_NAME_LENGTH_FORMAT, MIN_NAME_LENGTH));
         }
     }
-    
+
     public void insertStation(int position, Station station) {
         station.addLine(this);
         this.stationList.add(position, station);
@@ -2411,7 +2411,7 @@ import subway.view.View;
 
 public class SectionViewController implements ViewController {
     private final SectionController sectionController = new SectionController();
-    
+
     public void registerSection() {
         Console.printHeader("노선을 입력하세요.");
         String lienName = Console.readline();
@@ -2527,7 +2527,7 @@ import subway.service.SectionService;
 
 public class SectionController implements Controller {
     private final SectionService sectionService = new SectionService();
-    
+
     public void deleteSection(String lineName, String stationName) {
         LineDTO lineDTO = new LineDTO(lineName);
         StationDTO stationDTO = new StationDTO(stationName);
@@ -2549,7 +2549,7 @@ import subway.view.View;
 
 public class SectionViewController implements ViewController {
     private final SectionController sectionController = new SectionController();
-    
+
     public void removeSection() {
         Console.printHeader("삭제할 구간의 노선을 입력하세요.");
         String lienName = Console.readline();
@@ -2585,3 +2585,216 @@ public class SectionMenu extends Menu<SectionViewController> {
 ```
 
 구간 삭제 기능 구현.
+
+## 30. 구간 관리 유효성 체크
+
+```java
+// Validation.java
+
+package subway.util;
+
+import java.util.regex.Pattern;
+
+public final class Validation {
+    private Validation() {
+    }
+
+    public static boolean isNumeric(String str) {
+        return Pattern.matches("^[0-9]*$", str);
+    }
+}
+```
+
+문자 숫자 형태 체크 기능 생성.
+
+```java
+// SectionControllerConstants.java
+
+package subway.controller;
+
+public final class SectionControllerConstants {
+    private SectionControllerConstants() {
+    }
+
+    public static final String NOT_NUMERIC_ORDER_MESSAGE = "순서는 숫자만 입력 가능합니다.";
+}
+```
+
+````java
+// SectionController.java
+
+package subway.controller;
+
+import static subway.controller.SectionControllerConstants.*;
+
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.service.SectionService;
+import subway.util.Validation;
+
+public class SectionController implements Controller {
+    private final SectionService sectionService = new SectionService();
+
+    public void insertSection(String lineName, String stationName, String _position) throws IllegalArgumentException {
+        LineDTO lineDTO = new LineDTO(lineName);
+        StationDTO stationDTO = new StationDTO(stationName);
+        if (!Validation.isNumeric(_position)) {
+            throw new IllegalArgumentException(NOT_NUMERIC_ORDER_MESSAGE);
+        }
+        int position = Integer.parseInt(_position);
+        sectionService.insertSection(lineDTO, stationDTO, position);
+    }
+}
+````
+
+구간 등록시 입력받은 순서 값 유효성 체크.
+
+```java
+// StationConstants.java
+
+package subway.domain;
+
+public final class StationConstants {
+    private StationConstants() {
+    }
+
+    public static final String ALREADY_CONTAIN_LINE_MESSAGE = "이미 구간에 등록된 노선 이름입니다.";
+    public static final String NOT_CONTAIN_LINE_MESSAGE = "구간에 등록되지 않은 노선 이름입니다.";
+}
+```
+
+```java
+// Station.java
+
+package subway.domain;
+
+import static subway.domain.StationConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.dto.StationDTO;
+
+public class Station implements Entity<StationDTO> {
+    public void addLine(Line line) throws IllegalArgumentException {
+        if (this.lineList.contains(line)) {
+            throw new IllegalArgumentException(ALREADY_CONTAIN_LINE_MESSAGE);
+        }
+        this.lineList.add(line);
+    }
+
+    public void removeLine(Line line) throws IllegalArgumentException {
+        if (!this.lineList.contains(line)) {
+            throw new IllegalArgumentException(NOT_CONTAIN_LINE_MESSAGE);
+        }
+        this.lineList.remove(line);
+    }
+}
+```
+
+Station 에서 구간 등록 및 삭제시 Line 존재, 미존재 여부 체크.
+
+```java
+// LineConstants.java
+
+package subway.domain;
+
+public final class LineConstants {
+    private LineConstants() {
+    }
+
+    public static final String ALREADY_CONTAIN_STATION_MESSAGE = "이미 구간에 등록된 역 이름입니다.";
+    public static final String RANGE_OVER_ORDER_FORMAT = "%d ~ %d 범위 내 순서만 입력 가능합니다.";
+    public static final String NOT_CONTAIN_STATION_MESSAGE = "구간에 등록되지 않은 역 이름입니다.";
+}
+```
+
+```java
+// Line.java
+
+package subway.domain;
+
+import static subway.domain.LineConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.dto.LineDTO;
+
+public class Line implements Entity<LineDTO> {
+    public void insertStation(int position, Station station) throws IllegalArgumentException {
+        if (this.stationList.contains(station)) {
+            throw new IllegalArgumentException(ALREADY_CONTAIN_STATION_MESSAGE);
+        }
+        if (position < 0 || position > this.stationList.size()) {
+            throw new IllegalArgumentException(String.format(RANGE_OVER_ORDER_FORMAT, 0, this.stationList.size()));
+        }
+        station.addLine(this);
+        this.stationList.add(position, station);
+    }
+
+    public void addStation(Station station) throws IllegalArgumentException {
+        this.insertStation(this.stationList.size(), station);
+    }
+
+    public void removeStation(Station station) throws IllegalArgumentException {
+        if (!this.stationList.contains(station)) {
+            throw new IllegalArgumentException(NOT_CONTAIN_STATION_MESSAGE);
+        }
+        station.removeLine(this);
+        this.stationList.remove(station);
+    }
+}
+```
+
+Line 에서 구간 등록시 Station 존재와 순서 범위 체크하고 삭제시 Station 미존재 여부 체크.
+
+```java
+// SectionServiceConstants.java
+
+package subway.service;
+
+public final class SectionServiceConstants {
+    private SectionServiceConstants() {
+    }
+
+    public static final String NOT_EXISTS_STATION_NAME_MESSAGE = "존재하지 않은 역 이름입니다.";
+    public static final String NOT_EXISTS_LINE_NAME_MESSAGE = "존재하지 않은 노선 이름입니다.";
+}
+```
+
+```java
+
+// SectionService.java
+
+package subway.service;
+
+import static subway.service.SectionServiceConstants.*;
+
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
+
+public class SectionService implements Service {
+    public void insertSection(LineDTO lineDTO, StationDTO stationDTO, int position) throws IllegalArgumentException {
+        Line line = LineRepository.selectByName(lineDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION_NAME_MESSAGE));
+        Station station = StationRepository.selectByName(stationDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LINE_NAME_MESSAGE));
+        line.insertStation(position, station);
+    }
+
+    public void deleteSection(LineDTO lineDTO, StationDTO stationDTO) throws IllegalArgumentException {
+        Line line = LineRepository.selectByName(lineDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION_NAME_MESSAGE));
+        Station station = StationRepository.selectByName(stationDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LINE_NAME_MESSAGE));
+        line.removeStation(station);
+    }
+}
+```
+
+구간 등록 및 삭제시 Station, Line 존재 여부 체크.
