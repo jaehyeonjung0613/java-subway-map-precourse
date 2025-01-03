@@ -2804,7 +2804,6 @@ public class SectionService implements Service {
 ```java
 // Station.java
 
-
 package subway.domain;
 
 import static subway.domain.StationConstants.*;
@@ -2831,7 +2830,7 @@ package subway.service;
 public final class StationServiceConstants {
     private StationServiceConstants() {
     }
-    
+
     public static final String CONTAIN_LINE_STATION_NAME_MESSAGE = "노선에 등록된 역 이름입니다.";
 }
 ```
@@ -2856,7 +2855,7 @@ public class StationService implements Service {
         Optional<Station> optionalStation = StationRepository.selectByName(stationDTO.getName());
         Station station = optionalStation.orElseThrow(
             () -> new IllegalArgumentException(NOT_EXISTS_STATION_NAME_MESSAGE));
-        if(station.isContainLine()) {
+        if (station.isContainLine()) {
             throw new IllegalArgumentException(CONTAIN_LINE_STATION_NAME_MESSAGE);
         }
         StationRepository.deleteStation(station.getName());
@@ -2865,3 +2864,124 @@ public class StationService implements Service {
 ```
 
 역 삭제시 노선 등록 여부 체크.
+
+## 32. 노선 등록(종점역 입력)
+
+```java
+// SectionServiceConstants.java
+
+package subway.service;
+
+public final class SectionServiceConstants {
+    private SectionServiceConstants() {
+    }
+
+    public static final String NOT_EXISTS_FIRST_STATION_NAME_MESSAGE = "존재하지 않은 상행 종착역 이름입니다.";
+    public static final String NOT_EXISTS_LAST_STATION_NAME_MESSAGE = "존재하지 않은 하행 종착역 이름입니다.";
+    public static final String DUPLICATION_FINAL_STATION_NAME_MESSAGE = "동일한 종착역 이름은 존재할 수 없습니다.";
+}
+```
+
+```java
+// SectionService.java
+
+package subway.service;
+
+import static subway.service.SectionServiceConstants.*;
+
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
+
+public class SectionService implements Service {
+    public void initSection(LineDTO lineDTO, StationDTO fstStationDTO, StationDTO lstStationDTO) throws
+        IllegalArgumentException {
+        Line line = LineRepository.selectByName(lineDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LINE_NAME_MESSAGE));
+        Station fstStation = StationRepository.selectByName(fstStationDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_FIRST_STATION_NAME_MESSAGE));
+        Station lstStation = StationRepository.selectByName(lstStationDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LAST_STATION_NAME_MESSAGE));
+        if (fstStation == lstStation) {
+            throw new IllegalArgumentException(DUPLICATION_FINAL_STATION_NAME_MESSAGE);
+        }
+        line.insertStation(0, fstStation);
+        line.addStation(lstStation);
+    }
+}
+```
+
+구간 초기화 및 유효성 체크 기능 생성.
+
+```java
+// LineController.java
+
+package subway.controller;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.service.LineService;
+import subway.service.SectionService;
+
+public class LineController implements Controller {
+    private final SectionService sectionService = new SectionService();
+
+    public void insertLine(String lineName, String fstStationName, String lstStationName) throws
+        IllegalArgumentException {
+        LineDTO lineDTO = new LineDTO(lineName);
+        StationDTO fstStationDTO = new StationDTO(fstStationName);
+        StationDTO lstStationDTO = new StationDTO(lstStationName);
+        lineService.insertLine(lineDTO);
+        try {
+            sectionService.initSection(lineDTO, fstStationDTO, lstStationDTO);
+        } catch (IllegalArgumentException e) {
+            lineService.deleteLine(lineDTO);
+            throw e;
+        }
+    }
+}
+```
+
+Line 등록시 Section 초기화.
+
+Section 초기화 처리 중 예외 발생시 생성된 Line 삭제.
+
+```java
+// LineViewController.java
+
+package subway.controller;
+
+import java.util.List;
+
+import subway.menu.LineMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class LineViewController implements ViewController {
+    private final LineController lineController = new LineController();
+
+    public void registerLine() {
+        Console.printHeader("등록할 노선 이름을 입력하세요.");
+        String lineName = Console.readline();
+        Console.printNextLine();
+        Console.printHeader("등록할 노선의 상행 종점역 이름을 입력하세요.");
+        String fstStationName = Console.readline();
+        Console.printNextLine();
+        Console.printHeader("등록할 노선의 하행 종점역 이름을 입력하세요.");
+        String lstStationName = Console.readline();
+        Console.printNextLine();
+        lineController.insertLine(lineName, fstStationName, lstStationName);
+        Console.printInfo("지하철 노선이 등록되었습니다.");
+    }
+}
+```
+
+노선 등록시 상행, 하행 입력 절차 추가.
+
+
