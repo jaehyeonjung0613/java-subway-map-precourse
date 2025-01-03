@@ -26,7 +26,7 @@ public abstract class Menu<T extends ViewController> {
         return this.commandLineList.stream()
             .filter(commandLine -> commandLine.getCommand().equals(command))
             .findFirst()
-            .get();
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_COMMAND_MESSAGE));
     }
 
     public final String output(String command) {
