@@ -54,6 +54,10 @@ public class Line implements Entity<LineDTO> {
         if (!this.stationList.contains(station)) {
             throw new IllegalArgumentException(NOT_CONTAIN_STATION_MESSAGE);
         }
+        if (this.stationList.size() <= MIN_REQUIREMENT_STATION_COUNT) {
+            throw new IllegalArgumentException(
+                String.format(NOT_REQUIREMENT_STATION_COUNT_FORMAT, MIN_REQUIREMENT_STATION_COUNT));
+        }
         station.removeLine(this);
         this.stationList.remove(station);
     }
