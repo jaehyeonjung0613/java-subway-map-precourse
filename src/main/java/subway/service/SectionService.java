@@ -25,4 +25,19 @@ public class SectionService implements Service {
             .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LINE_NAME_MESSAGE));
         line.removeStation(station);
     }
+
+    public void initSection(LineDTO lineDTO, StationDTO fstStationDTO, StationDTO lstStationDTO) throws
+        IllegalArgumentException {
+        Line line = LineRepository.selectByName(lineDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LINE_NAME_MESSAGE));
+        Station fstStation = StationRepository.selectByName(fstStationDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_FIRST_STATION_NAME_MESSAGE));
+        Station lstStation = StationRepository.selectByName(lstStationDTO.getName())
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_LAST_STATION_NAME_MESSAGE));
+        if (fstStation == lstStation) {
+            throw new IllegalArgumentException(DUPLICATION_FINAL_STATION_NAME_MESSAGE);
+        }
+        line.insertStation(0, fstStation);
+        line.addStation(lstStation);
+    }
 }

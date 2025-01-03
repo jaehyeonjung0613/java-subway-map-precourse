@@ -25,9 +25,15 @@ public class LineViewController implements ViewController {
 
     public void registerLine() {
         Console.printHeader("등록할 노선 이름을 입력하세요.");
-        String name = Console.readline();
+        String lineName = Console.readline();
         Console.printNextLine();
-        lineController.insertLine(name);
+        Console.printHeader("등록할 노선의 상행 종점역 이름을 입력하세요.");
+        String fstStationName = Console.readline();
+        Console.printNextLine();
+        Console.printHeader("등록할 노선의 하행 종점역 이름을 입력하세요.");
+        String lstStationName = Console.readline();
+        Console.printNextLine();
+        lineController.insertLine(lineName, fstStationName, lstStationName);
         Console.printInfo("지하철 노선이 등록되었습니다.");
     }
 
