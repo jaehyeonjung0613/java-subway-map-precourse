@@ -3042,4 +3042,177 @@ public class Subway {
 
 애플리케이션 구동시 구간 기초 데이터 초기화.
 
+## 34. 지하철 노선도 출력
+
+```java
+// LineDAO.java
+
+package subway.dao;
+
+import java.util.Collections;
+import java.util.List;
+
+public class LineDAO {
+    private final String name;
+    private final List<String> stationNameList;
+
+    public LineDAO(String name, List<String> stationNameList) {
+        this.name = name;
+        this.stationNameList = stationNameList;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getStationNameList() {
+        return Collections.unmodifiableList(this.stationNameList);
+    }
+}
+```
+
+View 에게 전달할 조회용 객체 생성.
+
+```java
+// Line.java
+
+package subway.domain;
+
+import static subway.domain.LineConstants.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import subway.dto.LineDTO;
+
+public class Line implements Entity<LineDTO> {
+    private final String name;
+    private final List<Station> stationList;
+    
+    public List<Station> getStationList() {
+        return Collections.unmodifiableList(this.stationList);
+    }
+}
+```
+
+역 목록 반환 기능 생성.
+
+```java
+// SectionService.java
+
+package subway.service;
+
+import static subway.service.SectionServiceConstants.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.dao.LineDAO;
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.repository.LineRepository;
+import subway.repository.StationRepository;
+
+public class SectionService implements Service {
+    public List<LineDAO> selectAllLineNameWithStationName() {
+        List<Line> lineList = LineRepository.lines();
+        return lineList.stream().map((line) -> {
+                List<String> stationNameList = line.getStationList()
+                    .stream()
+                    .map(Station::getName)
+                    .collect(Collectors.toList());
+                return new LineDAO(line.getName(), stationNameList);
+            })
+            .collect(Collectors.toList());
+    }
+}
+```
+
+```java
+// SectionController.java
+
+package subway.controller;
+
+import static subway.controller.SectionControllerConstants.*;
+
+import java.util.List;
+
+import subway.dao.LineDAO;
+import subway.dto.LineDTO;
+import subway.dto.StationDTO;
+import subway.service.SectionService;
+import subway.util.Validation;
+
+public class SectionController implements Controller {
+    private final SectionService sectionService = new SectionService();
+    
+    public List<LineDAO> selectAllLineNameWithStationName() {
+        return sectionService.selectAllLineNameWithStationName();
+    }
+}
+```
+
+모든 Line 에 등록된 Station 명 반환 기능 생성.
+
+```java
+// MainViewController.java
+
+package subway.controller;
+
+import java.util.List;
+
+import subway.dao.LineDAO;
+import subway.menu.MainMenu;
+import subway.ui.Console;
+import subway.view.View;
+
+public class MainViewController implements ViewController {
+    private final SectionController sectionController = new SectionController();
+
+    public void printSubwayMap() {
+        Console.printHeader("지하철 노선도");
+        List<LineDAO> lineDAOList = sectionController.selectAllLineNameWithStationName();
+        List<String> stationNameList;
+        for (LineDAO lineDAO : lineDAOList) {
+            Console.printInfo(lineDAO.getName());
+            Console.printInfo("---");
+            stationNameList = lineDAO.getStationNameList();
+            for (String stationName : stationNameList) {
+                Console.printInfo(stationName);
+            }
+            Console.printNextLine();
+        }
+    }
+}
+```
+
+```java
+// MainMenu.java
+
+package subway.menu;
+
+import subway.controller.MainViewController;
+
+public class MainMenu extends Menu<MainViewController> {
+    public MainMenu(MainViewController viewController) {
+        super(viewController);
+    }
+
+    @Override
+    protected void setup() {
+        this.addMenuItem("1", "역 관리", this.viewController::openStationView);
+        this.addMenuItem("2", "노선 관리", this.viewController::openLineView);
+        this.addMenuItem("3", "구간 관리", this.viewController::openSectionView);
+        this.addMenuItem("4", "지하철 노선도 출력", this.viewController::printSubwayMap);
+        this.addMenuItem("Q", "종료", this::close);
+    }
+}
+```
+
+지하철 노선도 출력 구현.
+
+
 
