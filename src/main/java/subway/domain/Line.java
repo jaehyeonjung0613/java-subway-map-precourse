@@ -3,6 +3,7 @@ package subway.domain;
 import static subway.domain.LineConstants.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import subway.dto.LineDTO;
@@ -28,6 +29,10 @@ public class Line implements Entity<LineDTO> {
 
     public String getName() {
         return name;
+    }
+
+    public List<Station> getStationList() {
+        return Collections.unmodifiableList(this.stationList);
     }
 
     public void insertStation(int position, Station station) throws IllegalArgumentException {

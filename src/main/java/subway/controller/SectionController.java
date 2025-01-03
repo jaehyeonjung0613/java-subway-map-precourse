@@ -2,6 +2,9 @@ package subway.controller;
 
 import static subway.controller.SectionControllerConstants.*;
 
+import java.util.List;
+
+import subway.dao.LineDAO;
 import subway.dto.LineDTO;
 import subway.dto.StationDTO;
 import subway.service.SectionService;
@@ -24,5 +27,9 @@ public class SectionController implements Controller {
         LineDTO lineDTO = new LineDTO(lineName);
         StationDTO stationDTO = new StationDTO(stationName);
         sectionService.deleteSection(lineDTO, stationDTO);
+    }
+
+    public List<LineDAO> selectAllLineNameWithStationName() {
+        return sectionService.selectAllLineNameWithStationName();
     }
 }

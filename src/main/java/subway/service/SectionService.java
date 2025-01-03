@@ -2,6 +2,10 @@ package subway.service;
 
 import static subway.service.SectionServiceConstants.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import subway.dao.LineDAO;
 import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.LineDTO;
@@ -39,5 +43,17 @@ public class SectionService implements Service {
         }
         line.insertStation(0, fstStation);
         line.addStation(lstStation);
+    }
+
+    public List<LineDAO> selectAllLineNameWithStationName() {
+        List<Line> lineList = LineRepository.lines();
+        return lineList.stream().map((line) -> {
+                List<String> stationNameList = line.getStationList()
+                    .stream()
+                    .map(Station::getName)
+                    .collect(Collectors.toList());
+                return new LineDAO(line.getName(), stationNameList);
+            })
+            .collect(Collectors.toList());
     }
 }
