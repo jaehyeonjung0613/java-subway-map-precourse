@@ -2798,3 +2798,70 @@ public class SectionService implements Service {
 ```
 
 구간 등록 및 삭제시 Station, Line 존재 여부 체크.
+
+## 31. 역 삭제(노선 등록된 경우)
+
+```java
+// Station.java
+
+
+package subway.domain;
+
+import static subway.domain.StationConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.dto.StationDTO;
+
+public class Station implements Entity<StationDTO> {
+    public boolean isContainLine() {
+        return !this.lineList.isEmpty();
+    }
+}
+```
+
+노선 등록 여부 확인 기능 생성.
+
+```java
+// StationServiceConstants.java
+
+package subway.service;
+
+public final class StationServiceConstants {
+    private StationServiceConstants() {
+    }
+    
+    public static final String CONTAIN_LINE_STATION_NAME_MESSAGE = "노선에 등록된 역 이름입니다.";
+}
+```
+
+```java
+// StationService.java
+
+package subway.service;
+
+import static subway.service.StationServiceConstants.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import subway.domain.Station;
+import subway.dto.StationDTO;
+import subway.repository.StationRepository;
+
+public class StationService implements Service {
+    public void deleteStation(StationDTO stationDTO) throws IllegalArgumentException {
+        Optional<Station> optionalStation = StationRepository.selectByName(stationDTO.getName());
+        Station station = optionalStation.orElseThrow(
+            () -> new IllegalArgumentException(NOT_EXISTS_STATION_NAME_MESSAGE));
+        if(station.isContainLine()) {
+            throw new IllegalArgumentException(CONTAIN_LINE_STATION_NAME_MESSAGE);
+        }
+        StationRepository.deleteStation(station.getName());
+    }
+}
+```
+
+역 삭제시 노선 등록 여부 체크.
