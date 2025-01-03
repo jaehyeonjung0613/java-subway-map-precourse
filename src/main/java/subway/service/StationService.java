@@ -25,9 +25,12 @@ public class StationService implements Service {
     }
 
     public void deleteStation(StationDTO stationDTO) throws IllegalArgumentException {
-        Station station = stationDTO.toEntity();
-        Optional<Station> existedStation = StationRepository.selectByName(station.getName());
-        existedStation.orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION_NAME_MESSAGE));
+        Optional<Station> optionalStation = StationRepository.selectByName(stationDTO.getName());
+        Station station = optionalStation.orElseThrow(
+            () -> new IllegalArgumentException(NOT_EXISTS_STATION_NAME_MESSAGE));
+        if(station.isContainLine()) {
+            throw new IllegalArgumentException(CONTAIN_LINE_STATION_NAME_MESSAGE);
+        }
         StationRepository.deleteStation(station.getName());
     }
 }
