@@ -3214,5 +3214,55 @@ public class MainMenu extends Menu<MainViewController> {
 
 지하철 노선도 출력 구현.
 
+## 35. 구간 삭제(두개 이하 역)
+
+```java
+// LineConstants.java
+
+package subway.domain;
+
+public final class LineConstants {
+    private LineConstants() {
+    }
+    
+    public static final int MIN_REQUIREMENT_STATION_COUNT = 2;
+    
+    public static final String NOT_REQUIREMENT_STATION_COUNT_FORMAT = "노선에 포험된 역은 최소 %d 개 이여야 합니다.";
+}
+```
+
+```java
+// Line.java
+
+package subway.domain;
+
+import static subway.domain.LineConstants.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import subway.dto.LineDTO;
+
+public class Line implements Entity<LineDTO> {
+    private final String name;
+    private final List<Station> stationList;
+    
+    public void removeStation(Station station) throws IllegalArgumentException {
+        if (!this.stationList.contains(station)) {
+            throw new IllegalArgumentException(NOT_CONTAIN_STATION_MESSAGE);
+        }
+        if (this.stationList.size() <= MIN_REQUIREMENT_STATION_COUNT) {
+            throw new IllegalArgumentException(
+                String.format(NOT_REQUIREMENT_STATION_COUNT_FORMAT, MIN_REQUIREMENT_STATION_COUNT));
+        }
+        station.removeLine(this);
+        this.stationList.remove(station);
+    }
+}
+```
+
+등록된 역 삭제시 최소 개수 여부 확인.
+
 
 
