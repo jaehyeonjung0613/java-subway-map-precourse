@@ -3017,7 +3017,6 @@ public class SectionRepository {
 ```java
 // Subway.java
 
-
 package subway.infrastructure;
 
 import subway.controller.MainViewController;
@@ -3089,7 +3088,7 @@ import subway.dto.LineDTO;
 public class Line implements Entity<LineDTO> {
     private final String name;
     private final List<Station> stationList;
-    
+
     public List<Station> getStationList() {
         return Collections.unmodifiableList(this.stationList);
     }
@@ -3148,7 +3147,7 @@ import subway.util.Validation;
 
 public class SectionController implements Controller {
     private final SectionService sectionService = new SectionService();
-    
+
     public List<LineDAO> selectAllLineNameWithStationName() {
         return sectionService.selectAllLineNameWithStationName();
     }
@@ -3224,9 +3223,9 @@ package subway.domain;
 public final class LineConstants {
     private LineConstants() {
     }
-    
+
     public static final int MIN_REQUIREMENT_STATION_COUNT = 2;
-    
+
     public static final String NOT_REQUIREMENT_STATION_COUNT_FORMAT = "노선에 포험된 역은 최소 %d 개 이여야 합니다.";
 }
 ```
@@ -3247,7 +3246,7 @@ import subway.dto.LineDTO;
 public class Line implements Entity<LineDTO> {
     private final String name;
     private final List<Station> stationList;
-    
+
     public void removeStation(Station station) throws IllegalArgumentException {
         if (!this.stationList.contains(station)) {
             throw new IllegalArgumentException(NOT_CONTAIN_STATION_MESSAGE);
@@ -3264,5 +3263,43 @@ public class Line implements Entity<LineDTO> {
 
 등록된 역 삭제시 최소 개수 여부 확인.
 
+## 36. 명령어 재입력 안내
+
+```java
+// MenuConstants.java
+
+package subway.menu;
+
+public final class MenuConstants {
+    private MenuConstants() {
+    }
+
+    public static final String NOT_EXISTS_COMMAND_MESSAGE = "선택할 수 없는 기능입니다.";
+}
+```
+
+```java
+// Menu.java
+
+package subway.menu;
+
+import static subway.menu.MenuConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import subway.controller.ViewController;
+
+public abstract class Menu<T extends ViewController> {
+    private CommandLine getCommandLine(String command) {
+        return this.commandLineList.stream()
+            .filter(commandLine -> commandLine.getCommand().equals(command))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_COMMAND_MESSAGE));
+    }
+}
+```
+
+존재하지 않은 명령어는 예외 처리.
 
 
