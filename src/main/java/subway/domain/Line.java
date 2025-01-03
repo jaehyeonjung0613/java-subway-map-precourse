@@ -30,16 +30,25 @@ public class Line implements Entity<LineDTO> {
         return name;
     }
 
-    public void insertStation(int position, Station station) {
+    public void insertStation(int position, Station station) throws IllegalArgumentException {
+        if (this.stationList.contains(station)) {
+            throw new IllegalArgumentException(ALREADY_CONTAIN_STATION_MESSAGE);
+        }
+        if (position < 0 || position > this.stationList.size()) {
+            throw new IllegalArgumentException(String.format(RANGE_OVER_ORDER_FORMAT, 0, this.stationList.size()));
+        }
         station.addLine(this);
         this.stationList.add(position, station);
     }
 
-    public void addStation(Station station) {
+    public void addStation(Station station) throws IllegalArgumentException {
         this.insertStation(this.stationList.size(), station);
     }
 
-    public void removeStation(Station station) {
+    public void removeStation(Station station) throws IllegalArgumentException {
+        if (!this.stationList.contains(station)) {
+            throw new IllegalArgumentException(NOT_CONTAIN_STATION_MESSAGE);
+        }
         station.removeLine(this);
         this.stationList.remove(station);
     }

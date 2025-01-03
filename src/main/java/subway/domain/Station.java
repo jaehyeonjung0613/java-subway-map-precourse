@@ -30,11 +30,17 @@ public class Station implements Entity<StationDTO> {
         return name;
     }
 
-    public void addLine(Line line) {
+    public void addLine(Line line) throws IllegalArgumentException {
+        if (this.lineList.contains(line)) {
+            throw new IllegalArgumentException(ALREADY_CONTAIN_LINE_MESSAGE);
+        }
         this.lineList.add(line);
     }
 
-    public void removeLine(Line line) {
+    public void removeLine(Line line) throws IllegalArgumentException {
+        if (!this.lineList.contains(line)) {
+            throw new IllegalArgumentException(NOT_CONTAIN_LINE_MESSAGE);
+        }
         this.lineList.remove(line);
     }
 
